@@ -1,27 +1,24 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>Berikut daftar kantin yang bisa anda kunjungi,<br /></p>
-    <div class="kontainer">
-      <div
-        v-for="item in items"
-        :key="item.id"
-        @click="redirect(item.coordinat)"
-        class="card"
-      >
-        <div class="container">
-          <h4>
-            <b>{{ item.nama_resto }}</b>
-          </h4>
-          <p>{{ item.alamat }}</p>
-        </div>
-      </div>
+    <div class="FailedUser"> {{Pesan }}</div>
+    <div v-if="openFrom" class="kontainer">
+    <p>Anda Berhasil Subscribe isi data anda untuk dikirimkan hadiah,<br /></p>
+     <input class="field" v-model="user_delivery_address" placeholder="alamat">
+     <input class="field" v-model="contact_number" placeholder="No. Telp">
+     <input class="field" v-model="contact_person_name" placeholder="Nama Panggilan">
+     <button @click="kirim()">Kirim</button>
+    </div>
+    
+    <div v-if="!openFrom&Pesan.length<=0" class="kontainer">
+    <p>Data Anda berhasil terkirim, silahkan menunggu proses selanjutnya...<br /></p>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios"; 
+ 
 export default {
   name: "HelloWorld",
   props: {
@@ -29,17 +26,46 @@ export default {
   },
   data() {
     return {
+      openFrom:false,
       items: [],
+      dataUser: [],
+      Pesan: '',
+      user_delivery_address: '',
+      contact_number: '',
+      contact_person_name: '', 
     };
   },
-  created() {
+  mounted(){ 
+   setTimeout(()=>{  
     axios
-      .get("https://mapsresto.herokuapp.com/api/showresto")
+      .get(`https://us-central1-silicon-airlock-153323.cloudfunctions.net/rg-package-dummy?userId=${this.$route.query.userId}`)
       .then((response) => {
-        this.items = response.data.data;
+        this.dataUser = response.data.data;
+        this.openFrom=true;
+        
+      }).catch(()=>{
+          this.Pesan="Kamu belum subscribe..."
       });
-  },
+    }, 500); 
+  }, 
   methods: {
+    kirim(){
+      const params = new URLSearchParams();
+                params.append('user_id', this.$route.query.userId);
+                params.append('user_delivery_address', this.user_delivery_address);
+                params.append('contact_number', this.contact_number);
+                params.append('contact_person_name', this.contact_person_name); 
+                axios({
+                    method: 'post',
+                    url: 'http://127.0.0.1:8000/api/add-sub',
+                    data: params
+                }).then(()=>{
+
+                  this.openFrom=false;
+                }).catch(()=>{
+          this.Pesan="Data yang kamu isi salah, silahkan coba lagi..."
+      });
+    },
     redirect(kordinat) {
       window.open(
         "http://www.google.com/maps/place/" +
@@ -101,5 +127,14 @@ b {
 
 .container {
   padding: 2px 16px;
+}
+
+.field{
+  margin:10px;
+  width: 30%;
+}
+
+.FailedUser{
+  color:red;
 }
 </style>

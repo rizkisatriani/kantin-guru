@@ -1,6 +1,6 @@
 <template>
   <img alt="Vue logo" src="./assets/logo_rg.png" class="logo">
-  <HelloWorld msg="Selamat Datang Di Web Kantin"/>
+  <HelloWorld msg="Selamat Datang"/>
 </template>
 
 <script>
