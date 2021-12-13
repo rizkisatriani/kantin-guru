@@ -57,7 +57,7 @@ export default {
                 params.append('contact_person_name', this.contact_person_name); 
                 axios({
                     method: 'post',
-                    url: 'http://127.0.0.1:8000/api/add-sub',
+                    url: 'http://mapsresto.herokuapp.com//api/add-sub',
                     data: params
                 }).then(()=>{
 
